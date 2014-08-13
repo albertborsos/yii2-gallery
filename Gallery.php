@@ -19,8 +19,6 @@ class Gallery extends Widget {
     public $htmlOptions = [];
     public $pluginOptions = [];
 
-    public $items = [];
-
     public $header;
     public $galleryId;
 
@@ -44,13 +42,11 @@ class Gallery extends Widget {
         echo Html::beginTag('div', ['id' => 'gallery-container', 'data-id' => $this->galleryId]);
             echo Html::beginTag('div', ['id' => 'gallery-'.$this->galleryId.'-before', 'style' => 'display:none;']);
             echo Html::endTag('div');
-            if(!empty($this->items)){
-                if (!is_null($this->header)){
-                    echo Html::tag('h3', $this->header, ['style' => 'text-align:center;']);
-                }
-                $this->renderLinks();
-                $this->registerClientScripts();
+            if (!is_null($this->header)){
+                echo Html::tag('h3', $this->header, ['style' => 'text-align:center;']);
             }
+            $this->renderLinks();
+            $this->registerClientScripts();
             echo Html::beginTag('div', ['id' => 'gallery-'.$this->galleryId.'-after', 'style' => 'display:none;']);
             echo Html::endTag('div');
         echo Html::endTag('div');
@@ -77,7 +73,7 @@ class Gallery extends Widget {
                 'title' => $model->title,
             ];
 
-            echo Html::beginTag('div', ['class' => 'span4 photo-item']);
+            echo Html::beginTag('div', ['class' => 'col-sm-3 photo-item']);
             echo Html::a(Html::img($src), $url, $options);
             echo Html::endTag('div');
 
@@ -107,6 +103,7 @@ class Gallery extends Widget {
     }
 
     private function registerClientScripts(){
-
+        $view = $this->getView();
+        GalleryAsset::register($view);
     }
 }
