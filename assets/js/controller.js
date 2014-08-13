@@ -1,4 +1,10 @@
 $(function(){
+    // lightbox
+    $(document).ajaxStop(function() {
+        initLightbox();
+    });
+    initLightbox();
+
     $(document).on('click', '.gallery-pager', function(e){
         e.preventDefault();
         var page       = $(this).attr('data-page');
@@ -21,6 +27,28 @@ $(function(){
         load_other_images();
     }
 });
+
+function initLightbox(){
+    $('a[data-rel^=lightbox][data-rel$="]"], a[data-rel=lightbox]').magnificPopup({
+        gallery: {
+            enabled: true
+        },
+        type: 'image',
+        tClose: 'Bezárás',
+        callbacks: {
+            open: function() {
+                // Will fire when this exact popup is opened
+                // this - is Magnific Popup object
+                //add_other_image_to_right();
+            },
+            close: function() {
+                // Will fire when popup is closed
+            }
+            // e.t.c.
+        }
+    });
+    return false;
+}
 
 function load_other_images(){
     var gallery_id  = $('#gallery-container').attr('data-id');

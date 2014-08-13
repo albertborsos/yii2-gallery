@@ -18,11 +18,13 @@ class GalleryAsset extends AssetBundle
     public $sourcePath = '@vendor/albertborsos/yii2-gallery/assets/';
 
     public $css = [
-        'css/style.css'
+        'css/style.css',
+        'vendor/Magnific-Popup/dist/magnific-popup.css',
     ];
 
     public $js = [
         'js/controller.js',
+        'vendor/Magnific-Popup/dist/jquery.magnific-popup.min.js',
     ];
 
     public $depends = [
