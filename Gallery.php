@@ -11,6 +11,7 @@ namespace albertborsos\yii2gallery;
 use albertborsos\yii2cms\models\GalleryPhotos;
 use albertborsos\yii2lib\helpers\S;
 use yii\base\Widget;
+use yii\data\ActiveDataProvider;
 use yii\data\Pagination;
 use yii\helpers\Html;
 use yii\widgets\LinkPager;
@@ -23,10 +24,10 @@ class Gallery extends Widget {
     public $galleryId;
 
     public $pager;
-    public $page = 0;
-    public $pageSize = 6;
+    public $page         = 0;
+    public $pageSize     = 20;
     public $itemNumInRow = 3;
-    public $order = 'ASC';
+    public $order        = 'ASC';
 
     public $displayControl = false;
 
@@ -39,7 +40,7 @@ class Gallery extends Widget {
 
     public function run()
     {
-        echo Html::beginTag('div', ['id' => 'gallery-container', 'data-id' => $this->galleryId]);
+        echo Html::beginTag('div', ['id' => 'gallery-container', 'data-id' => $this->galleryId, 'style' => 'text-align:center;', 'data-pagesize' => $this->pageSize]);
             echo Html::beginTag('div', ['id' => 'gallery-'.$this->galleryId.'-before', 'style' => 'display:none;']);
             echo Html::endTag('div');
             if (!is_null($this->header)){
@@ -53,12 +54,22 @@ class Gallery extends Widget {
     }
 
     private function renderLinks(){
-        echo $this->getPager();
-        $models = GalleryPhotos::findAll([
-            'status' =>'a',
-            'gallery_id' => $this->galleryId,
+        $query = GalleryPhotos::find()->where(['status' => 'a', 'gallery_id' => $this->galleryId]);
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => [
+                'pageSize' => $this->pageSize,
+                'totalCount' => $query->count(),
+                'page' => $this->page,
+            ],
+            'sort' => [
+                'defaultOrder' => 'id '.$this->order,
+            ],
         ]);
 
+        $models = $dataProvider->getModels();
+
+        echo $this->getPager($dataProvider->getPagination());
         echo Html::beginTag('div', $this->htmlOptions);
         $n = 0;
         foreach($models as $model){
@@ -83,21 +94,19 @@ class Gallery extends Widget {
                 $n = 0;
             }
         }
+        if ($n !== 0){
+            echo Html::endTag('div');
+        }
         echo Html::endTag('div');
-        echo $this->getPager();
+        echo $this->getPager($dataProvider->getPagination());
     }
 
-    private function getPager(){
+    private function getPager($pagination){
         if (is_null($this->pager)){
-            $query = GalleryPhotos::find()->where([
-                'status' => 'a',
-                'gallery_id' =>$this->galleryId,
-            ]);
-            $pagination = new Pagination(['totalCount' => $query->count()]);
             $this->pager = LinkPager::widget([
                 'pagination' => $pagination,
+                'options' => ['class' => 'pagination', 'style' => 'margin:20px auto;'],
             ]);
-
         }
         return $this->pager;
     }
@@ -105,5 +114,22 @@ class Gallery extends Widget {
     private function registerClientScripts(){
         $view = $this->getView();
         GalleryAsset::register($view);
+    }
+
+    public static function renderLinksOnly($dataProvider){
+        $links = '';
+        $models = $dataProvider->getModels();
+
+        foreach($models as $model){
+            $url = $model->getUrlFull();
+            $options = [
+                'data-rel' => 'lightbox[gallery-'.$model->gallery_id.']',
+                'title' => $model->title,
+            ];
+
+            $links .= Html::a('', $url, $options);
+        }
+
+        return $links;
     }
 }

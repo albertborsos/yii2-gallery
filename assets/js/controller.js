@@ -5,16 +5,16 @@ $(function(){
     });
     initLightbox();
 
-    $(document).on('click', '.gallery-pager', function(e){
+    $(document).on('click', '#gallery-container .pagination li a', function(e){
         e.preventDefault();
         var page       = $(this).attr('data-page');
         var gallery_id = $('#gallery-container').attr('data-id');
         
-        var url_to_call = baseurl + '/cms/galleries/renderajaxgallery?id='+gallery_id+'&page='+page;
+        var url_to_call = baseurl + '/cms/galleries/renderajaxgallery?id='+gallery_id+'&page='+page
         
         $.ajax({
             url: url_to_call,
-            type: 'GET',
+            type: 'POST',
             success: function(data) {
                 $('#gallery-container').hide().fadeOut('slow').fadeIn('slow').html(data);
                 load_other_images();
@@ -52,9 +52,9 @@ function initLightbox(){
 
 function load_other_images(){
     var gallery_id  = $('#gallery-container').attr('data-id');
-    var active_page = $('#gallery-container .pagination li.active').attr('data-page');
+    var active_page = $('#gallery-container .pagination li.active a').attr('data-page');
     // ehhez a galéria id-hoz kell betölteni a többi képet
-    var url_to_call = baseurl + '/cms/galleries/loadotherimages?gallery_id='+gallery_id+'&active_page='+active_page;
+    var url_to_call = baseurl + '/cms/galleries/loadotherimages?id='+gallery_id+'&activePage='+active_page;
 
     $.ajax({
         url: url_to_call,
