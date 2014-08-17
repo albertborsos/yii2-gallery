@@ -10,6 +10,9 @@
 			"email": "hello@borsosalbert.hu"
 		}
 	],
+    "require": {
+        "yurkinx/yii2-image": "*"
+    },
 	"autoload": {
 		"psr-4": {
 			"albertborsos\\yii2gallery\\": ""
