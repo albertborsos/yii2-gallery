@@ -9,12 +9,12 @@ and open the template in the editor.
 */
 
 .photo-item{
-    text-align:center;
+    text-align:center !important;
 }
 .photo-item img{
     border:2px solid #fff;
     border-radius: 10px !important;
-    margin:2px;
+    margin:2px auto !important;
     max-height:178px;
 }
 .photo-item img:hover{

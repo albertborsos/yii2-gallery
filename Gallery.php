@@ -29,6 +29,8 @@ class Gallery extends Widget {
     public $itemNumInRow = 3;
     public $order        = 'ASC';
 
+    public $photoWrapperClass = 'col-sm-3';
+
     public $displayControl = false;
 
     public function init()
@@ -36,6 +38,11 @@ class Gallery extends Widget {
         parent::init();
         $this->htmlOptions['id'] = S::get($this->htmlOptions, 'id', $this->getId());
         $this->pluginOptions['container'] = '#'.$this->htmlOptions['id'].'-gallery';
+        $this->setPhotoWrapperClass();
+    }
+
+    private function setPhotoWrapperClass(){
+        $this->photoWrapperClass = 'col-sm-'.round(12/$this->itemNumInRow);
     }
 
     public function run()
@@ -84,8 +91,8 @@ class Gallery extends Widget {
                 'title' => $model->title,
             ];
 
-            echo Html::beginTag('div', ['class' => 'col-sm-3 photo-item']);
-            echo Html::a(Html::img($src), $url, $options);
+            echo Html::beginTag('div', ['class' => $this->photoWrapperClass.' photo-item']);
+            echo Html::a(Html::img($src, ['class' => 'img-responsive']), $url, $options);
             echo Html::endTag('div');
 
             $n++;
