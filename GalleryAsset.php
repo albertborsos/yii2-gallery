@@ -19,12 +19,12 @@ class GalleryAsset extends AssetBundle
 
     public $css = [
         'css/style.css',
-        'vendor/Magnific-Popup/dist/magnific-popup.css',
+        'vendor/Magnific-Popup/magnific-popup.css',
     ];
 
     public $js = [
         'js/controller.js',
-        'vendor/Magnific-Popup/dist/jquery.magnific-popup.min.js',
+        'vendor/Magnific-Popup/jquery.magnific-popup.min.js',
     ];
 
     public $depends = [
