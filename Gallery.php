@@ -9,14 +9,18 @@
 namespace albertborsos\yii2gallery;
 
 use albertborsos\yii2cms\models\GalleryPhotos;
+use albertborsos\yii2lib\bootstrap\Carousel;
 use albertborsos\yii2lib\helpers\S;
 use yii\base\Widget;
 use yii\data\ActiveDataProvider;
-use yii\data\Pagination;
 use yii\helpers\Html;
 use yii\widgets\LinkPager;
 
 class Gallery extends Widget {
+
+    const TYPE_GALLERY  = 'gallery';
+    const TYPE_CAROUSEL = 'carousel';
+
     public $htmlOptions = [];
     public $pluginOptions = [];
 
@@ -33,12 +37,17 @@ class Gallery extends Widget {
 
     public $displayControl = false;
 
+    private $galleryType = self::TYPE_GALLERY;
+
     public function init()
     {
         parent::init();
         $this->htmlOptions['id'] = S::get($this->htmlOptions, 'id', $this->getId());
         $this->pluginOptions['container'] = '#'.$this->htmlOptions['id'].'-gallery';
         $this->setPhotoWrapperClass();
+        if ($this->pageSize == 1 && $this->itemNumInRow == 1){
+            $this->galleryType = self::TYPE_CAROUSEL;
+        }
     }
 
     private function setPhotoWrapperClass(){
@@ -47,17 +56,36 @@ class Gallery extends Widget {
 
     public function run()
     {
+        switch($this->galleryType){
+            case self::TYPE_GALLERY:
+                $this->renderGallery();
+                break;
+            case self::TYPE_CAROUSEL:
+                $this->renderCarousel();
+                break;
+        }
+    }
+
+    public function renderGallery(){
         echo Html::beginTag('div', ['id' => 'gallery-container', 'data-id' => $this->galleryId, 'style' => 'text-align:center;', 'data-pagesize' => $this->pageSize]);
-            echo Html::beginTag('div', ['id' => 'gallery-'.$this->galleryId.'-before', 'style' => 'display:none;']);
-            echo Html::endTag('div');
-            if (!is_null($this->header)){
-                echo Html::tag('h3', $this->header, ['style' => 'text-align:center;']);
-            }
-            $this->renderLinks();
-            $this->registerClientScripts();
-            echo Html::beginTag('div', ['id' => 'gallery-'.$this->galleryId.'-after', 'style' => 'display:none;']);
-            echo Html::endTag('div');
+        echo Html::beginTag('div', ['id' => 'gallery-'.$this->galleryId.'-before', 'style' => 'display:none;']);
         echo Html::endTag('div');
+        if (!is_null($this->header)){
+            echo Html::tag('h3', $this->header, ['style' => 'text-align:center;']);
+        }
+        $this->renderLinks();
+        $this->registerClientScripts();
+        echo Html::beginTag('div', ['id' => 'gallery-'.$this->galleryId.'-after', 'style' => 'display:none;']);
+        echo Html::endTag('div');
+        echo Html::endTag('div');
+    }
+
+    public function renderCarousel(){
+        $items = $this->renderCarouselItems();
+        if (!is_null($this->header)){
+            echo Html::tag('h3', $this->header, ['style' => 'text-align:center;']);
+        }
+        echo Carousel::widget(['items' => $items]);
     }
 
     private function renderLinks(){
@@ -138,5 +166,26 @@ class Gallery extends Widget {
         }
 
         return $links;
+    }
+
+    private function renderCarouselItems(){
+        $query = GalleryPhotos::find()->where(['status' => 'a', 'gallery_id' => $this->galleryId]);
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'sort' => [
+                'defaultOrder' => 'id '.$this->order,
+            ],
+        ]);
+
+        $models = $dataProvider->getModels();
+
+        $items = [];
+        foreach($models as $model){
+            $items[] = [
+                'content' => Html::img($model->getUrlFull(), ['style'=>'width:100%;']),
+                'caption' => $model->title,
+            ];
+        }
+        return $items;
     }
 }
