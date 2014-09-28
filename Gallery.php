@@ -82,7 +82,7 @@ class Gallery extends Widget {
 
     public function renderCarousel(){
         $items = $this->renderCarouselItems();
-        if (!is_null($this->header)){
+        if (!is_null($this->header) && $this->header !== ''){
             echo Html::tag('h3', $this->header, ['style' => 'text-align:center;']);
         }
         echo Carousel::widget(['items' => $items]);
